@@ -1,73 +1,83 @@
-accounts = {}
+class BankAccount:
+    def __init__(self, acct_no, acct_name, balance=0):
+        self.acct_no = acct_no
+        self.acct_name = acct_name
+        self._balance = balance
 
-def create_account():
-    acct_no = input("Please input your account number: ")
-    acct_name = input("Please input your name: ")
-    init_amount = 0
-
-    if acct_no not in accounts:
-        accounts[acct_no] = {"Account Name": acct_name, "Balance": init_amount}
-        print(f"{acct_no} belonging to {acct_name} created successfully!")
-    else:
-        print("Account already exists!")
-
-def view_balance():
-    acct_no = input("Please input your account number: ")
-    if acct_no not in accounts:
-        print("Account does not exist.")
-    else:
-        for acct_no, details in accounts.items():
-            name = details["Account Name"]
-            balance = details["Balance"]
-            print(f"\nAccount Number: {acct_no}")
-            print(f"\nAccount Name: {name}")
-            print(f"\nBalance: ${balance}")
-
-def deposit():
-    acct_no = input("Please enter your account number: ")
-    if acct_no not in accounts:
-        print("Account doesn't exist.")
-    else:
-        amount = int(input("How much would you like to deposit? $"))
+    def deposit(self, amount):
         if amount <= 0:
             print("Invalid amount. Amount must be greater than zero.")
         else:
-            accounts[acct_no]["Balance"] += amount
-            print(f"Deposit of ${amount} successful!")
-            name = accounts[acct_no]["Account Name"]
-            balance = accounts[acct_no]["Balance"]
-            print(f"\nAccount Number: {acct_no}")
-            print(f"\nAccount Name: {name}")
-            print(f"\nNew Balance: ${balance}")
+            self._balance += amount
+            print(f"${amount} deposited successfully!")
+        
 
-def withdraw():
-    acct_no = input("Please enter your account number: ")
-    if acct_no not in accounts:
-        print("Account doesn't exist.")
-    else:
-        amount = int(input("How much would you like to withdraw? $"))
+    def withdraw(self, amount):   
         if amount <= 0:
-            print("Invalid amount. Amount must be greater than zero.")
+            print("Invalid amount. Amount must be greater than zero!")
+        elif amount > self._balance:
+            print("Insufficient funds for this transaction.")
         else:
-            accounts[acct_no]["Balance"] -= amount
-            print(f"Withdrawal of ${amount} successful!")
-            name = accounts[acct_no]["Account Name"]
-            balance = accounts[acct_no]["Balance"]
-            print(f"\nAccount Number: {acct_no}")
-            print(f"\nAccount Name: {name}")
-            print(f"\nNew Balance: ${balance}")
+            self._balance -= amount
+            print(f"${amount} withdrawn successfully!")
+        
+        
 
-def exit_app():
-    while True:
-        options = input("Would you like to exist? Y/N ").lower()
-        if options == "y":
-            print("Exiting app... ")
-            exit()
-        elif options == "n":
-            break
+    def display(self):   
+            print(f"\nAccount Number: {self.acct_no}")
+            print(f"Acoount Name: {self.acct_name}")
+            print(f"Acoount Balance: ${self._balance}")
+
+class Bank:
+    def __init__(self):
+        self.accounts = {}
+
+    def create_account(self):
+        acct_no = input("Please input your account number: ")
+        acct_name = input("Please enter your name: ")
+
+        if acct_no in self.accounts:
+            print("Account already exists!")
         else:
-            print("Invalid Command")
+            self.accounts[acct_no] = BankAccount(acct_no, acct_name)
+            print(f"Account belonging to {acct_name} created successfully! ")
+    
+    def get_account(self, acct_no):
+        return self.accounts.get(acct_no)
+    
+    def deposit(self):
+        acct_no = input("Please enter your account number: ")
+        account = self.get_account(acct_no)
 
+        if not account:
+            print("Account doesn't exist!")
+            return
+        
+        amount = int(input("Please enter deposit amount: $"))
+        account.deposit(amount)
+        account.display()
+
+    def withdraw(self):
+        acct_no = input("Please enter your account number: ")
+        account = self.get_account(acct_no)
+
+        if not account:
+            print("Account does not exist!")
+            return    
+
+        amount = int(input("Please enter amount to be withdrawn: $"))
+        account.withdraw(amount)
+        account.display()
+
+    def view_balance(self):
+        acct_no = input("Please enter your account number: ")
+        account = self.get_account(acct_no)
+
+        if not account:
+            print("Account does not exist!")
+        else:
+            account.display()
+        
 
 def main():
     print("\n --- Welcome to MyBank --- ")
@@ -77,19 +87,21 @@ def main():
     print("\n4. Withdraw")
     print("\n5. Exit app")
 
+    bank = Bank()
     while True:
+        
         selection = input("What would you like to do? ")
         
         if selection == "1":
-            create_account()
+            bank.create_account()
         elif selection == "2":
-            view_balance()
+            bank.view_balance()
         elif selection == "3":
-            deposit()
+            bank.deposit()
         elif selection == "4":
-            withdraw()
+            bank.withdraw()
         elif selection == "5":
-            exit_app()
+            break
         else:
             print("Invalid command. Please select an option from 1-5. ")
 
